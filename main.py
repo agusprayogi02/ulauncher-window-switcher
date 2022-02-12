@@ -50,7 +50,7 @@ class KeywordQueryEventListener(EventListener):
         w_dict = {
             x[1].split(maxsplit=2)[0]: {
                 "ws": int(x[1].split(maxsplit=2)[1]),
-                "name": x[1].split(maxsplit=2)[2],
+                "name": x[1].split(maxsplit=2)[len(x[1].split(maxsplit=2)) - 1],
             }
             for x in enumerate(w_list)
         }
@@ -70,20 +70,24 @@ class KeywordQueryEventListener(EventListener):
         ws_dict = {i: x for i, x in enumerate(ws_list)}
 
         for w_idx, window in w_dict.items():
-            if search == "" or search in window["name"].lower():
-                items.append(
-                    ExtensionResultItem(
-                        icon="images/window.svg",
-                        # Workaround for https://github.com/Ulauncher/Ulauncher/issues/587
-                        name=window["name"].replace("&", "&amp;")
-                        if search
-                        else window["name"],
-                        description="Workspace {}: {}, Window Id: {}".format(
-                            window["ws"], ws_dict[window["ws"]], w_idx
-                        ),
-                        on_enter=RunScriptAction("wmctrl -ia {}".format(w_idx)),
+            if window["name"] == '0':
+                print("None")
+            else:
+                if search == "" or search in window["name"].lower():
+                    items.append(
+                        ExtensionResultItem(
+                            icon="images/window.svg",
+                            # Workaround for https://github.com/Ulauncher/Ulauncher/issues/587
+                            name=window["name"].replace("&", "&amp;")
+                            if search
+                            else window["name"],
+                            description="Workspace {}: Window Id: {}".format(
+                                window["ws"], w_idx
+                            ),
+                            on_enter=RunScriptAction(
+                                "wmctrl -ia {}".format(w_idx)),
+                        )
                     )
-                )
 
         return RenderResultListAction(items)
 
